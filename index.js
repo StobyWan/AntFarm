@@ -37,7 +37,7 @@ class Ant {
     this.y = y;
     this.hasFood = false;
     this.pheromone = null;
-    this.lifeSpan = Math.round(Math.random() * 100);
+    this.lifeSpan = Math.round(Math.random() * 1000);
 
   }
 
@@ -61,6 +61,7 @@ class Ant {
   decrementLifeSpan() {
     this.lifeSpan = this.lifeSpan - 1
   }
+
   findFood(foodSources) {
     for (let foodSource of foodSources) {
       let dx = this.x - foodSource.x;
@@ -104,7 +105,9 @@ class Ant {
     return false;
   }
 }
-const ULID = require("ulid")
+
+const ULID = require("ulid");
+
 class AntSimulator {
   constructor(numAnts, numFoodSources) {
     this.ants = [];
