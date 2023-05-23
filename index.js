@@ -1,3 +1,5 @@
+const ULID = require("ulid");
+
 class FoodSource {
   constructor(x, y, foodAmount) {
     this.x = x;
@@ -105,8 +107,6 @@ class Ant {
     return false;
   }
 }
-
-const ULID = require("ulid");
 
 class AntSimulator {
   constructor(numAnts, numFoodSources) {
@@ -263,7 +263,7 @@ class AntSimulator {
   }
 }
 
-///////
+///////Socket Server
 const WebSocket = require("ws");
 let wss = new WebSocket.Server({ port: 8080 });
 wss.on("connection", (ws) => {
