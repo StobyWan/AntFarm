@@ -37,6 +37,8 @@ class Ant {
     this.y = y;
     this.hasFood = false;
     this.pheromone = null;
+    this.lifeSpan = Math.round(Math.random() * 100);
+
   }
 
   getState() {
@@ -56,6 +58,9 @@ class Ant {
     this.y += Math.random() - 0.5;
   }
 
+  decrementLifeSpan() {
+    this.lifeSpan = this.lifeSpan - 1
+  }
   findFood(foodSources) {
     for (let foodSource of foodSources) {
       let dx = this.x - foodSource.x;
@@ -99,7 +104,7 @@ class Ant {
     return false;
   }
 }
-
+const ULID = require("ulid")
 class AntSimulator {
   constructor(numAnts, numFoodSources) {
     this.ants = [];
@@ -108,7 +113,7 @@ class AntSimulator {
     this.gatheredFood = 0;
 
     for (let i = 0; i < numAnts; i++) {
-      this.ants.push(new Ant(i, 0, 0));
+      this.ants.push(new Ant(ULID.ulid(), 0, 0));
     }
     for (let i = 0; i < numFoodSources; i++) {
       // For simplicity, place food sources at random positions between -10 and 10.
@@ -185,15 +190,19 @@ class AntSimulator {
         if (ant.bringFoodHome()) {
           this.gatheredFood++;
 
-          if (this.gatheredFood > 100) {
-            for (let i = 0; i < 100; i++) {
-              this.ants.push(new Ant(i, 0, 0));
+          if (this.gatheredFood > this.ants.length) {
+            for (let i = 0; i < 10; i++) {
+              this.ants.push(new Ant(ULID.ulid(), 0, 0));
             }
             this.foodSources.push(
-              new FoodSource(10 * Math.random() - 10, 20 * Math.random() - 10, 100)
+              new FoodSource(2 * Math.random() - 10, 20 * Math.random() - 10, 100)
             );
           }
         }
+      }
+      ant.decrementLifeSpan();
+      if (ant.lifeSpan <= 0) {
+        this.ants = this.ants.filter(x=>x.id != ant.id)
       }
     }
 
@@ -261,3 +270,4 @@ wss.on("connection", (ws) => {
     ws.send(JSON.stringify(simulator.getState()));
   }, 500);
 });
+
