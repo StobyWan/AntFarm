@@ -11,7 +11,7 @@ To use AntFarm, you will need Node.js installed on your system. If you haven't i
 
 After setting up Node.js, clone this repository to your local machine:
 
-```git clone https://github.com/yourusername/AntFarm.git```
+```git clone https://github.com/StobyWan/AntFarm.git```
 Navigate into the cloned repository:
 
 
