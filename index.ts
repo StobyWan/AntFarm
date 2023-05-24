@@ -34,7 +34,7 @@ class Pheromone {
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
-    this.strength = 30; // The strength of the pheromone decreases over time.
+    this.strength = 10; // The strength of the pheromone decreases over time.
   }
 }
 
