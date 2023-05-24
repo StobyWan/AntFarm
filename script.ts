@@ -1,6 +1,3 @@
-
-
-
 declare var d3: any;
 let socket = new WebSocket("ws://localhost:8080");
 let scaleX = d3.scaleLinear().domain([-10, 10]).range([0, 800]);
