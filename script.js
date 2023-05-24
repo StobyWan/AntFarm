@@ -1,107 +1,10 @@
-// // Connect to the Node.js server with WebSocket.
-// // Replace 'ws://localhost:8080' with the address of your server.
-// let socket = new WebSocket('ws://localhost:8080');
-// let canvas = document.getElementById('canvas');
-// let ctx = canvas.getContext('2d');
-// let antPaths = [];
-// let scaleX = d3.scaleLinear().domain([-10, 10]).range([0, 800]);
-// let scaleY = d3.scaleLinear().domain([-10, 10]).range([0, 800]);
 
-// function drawAntPaths(ants) {
-//   ants.forEach(ant => {
-//     let existingPath = antPaths.find(path => path.id === ant.id);
-//     if (existingPath) {
-//       existingPath.x = scaleX(ant.x);
-//       existingPath.y = scaleY(ant.y);
-//     } else {
-//       antPaths.push({
-//         id: ant.id,
-//         x: scaleX(ant.x),
-//         y: scaleY(ant.y),
-//         alpha: 1.0 // Start with full opacity
-//       });
-//     }
-//   });
 
-//   // Draw ant paths and fade them over time
-//   antPaths.forEach(path => {
-//     ctx.fillStyle = `rgba(255, 255, 255, ${path.alpha})`; // Using RGBA color
-//     ctx.fillRect(path.x, path.y, 2, 2);
-//     path.alpha -= 0.01;
-//     if (path.alpha < 0) path.alpha = 0; // Ensure it doesn't go below 0
-//   });
-
-//   // Remove paths that have fully faded
-//   antPaths = antPaths.filter(path => path.alpha > 0);
-// }
-
-// socket.onmessage = function(event) {
-//   // Parse the incoming message to get the state of the simulation.
-//   const state = JSON.parse(event.data);
-//   const { pheromones, foodSources, ants } = state
-//   console.log('state', state)
-//   drawBackground();
-//   // drawFoodSources(foodSources);
-//   drawAntPaths(ants);
-//   // Scale the positions to fit within the SVG.
-//   // Select the SVG element.
-//   let svg = d3.select('svg');
-
-//   const antSelection = svg.selectAll('.ant').data(ants, d => d.id);
-
-//   antSelection.join(
-//     enter => enter.append('circle').attr('class', 'ant'),
-//     update => update,
-//     exit => exit.remove()
-//   )
-//     .attr('cx', d => scaleX(d.x))
-//     .attr('cy', d => scaleY(d.y))
-//     .attr('r', 5)
-//     .attr('fill', d => d.color);
-
-//   // Update the food sources.
-//   const foodSelection = svg.selectAll('.food').data(foodSources, d => `${d.x}-${d.y}`);
-
-//   foodSelection.join(
-//     enter => enter.append('circle').attr('class', 'food'),
-//     update => update,
-//     exit => exit.remove()
-//   )
-//     .attr('cx', d => scaleX(d.x))
-//     .attr('cy', d => scaleY(d.y))
-//     .attr('r', d => Math.sqrt(d.foodAmount) * 2)  // Size depends on the food amount.
-//     .attr('fill', 'green');
-
-//   // Update the pheromones.
-//   const pheromoneSelection = svg.selectAll('.pheromone').data(pheromones, d => `${d.x}-${d.y}`);
-
-//   pheromoneSelection.join(
-//     enter => enter.append('circle').attr('class', 'pheromone'),
-//     update => update,
-//     exit => exit.remove()
-//   )
-//     .attr('cx', d => scaleX(d.x))
-//     .attr('cy', d => scaleY(d.y))
-//     .attr('r', d => d.strength / 20)  // Size depends on the pheromone's strength.
-//     .attr('fill', 'purple');
-
-//    // Display gathered food.
-//    const foodCounter = d3.select('#food-counter');
-//    if (foodCounter.empty()) {
-//      foodCounter = svg.append('text')
-//        .attr('id', 'food-counter')
-//        .attr('x', 40)
-//        .attr('y', 200)
-//        .attr('font-size', '20px')
-//        .attr('fill', 'black');
-//    }
-//    foodCounter.text(`Gathered food: ${state.gatheredFood}`);
-// };
 let socket = new WebSocket("ws://localhost:8080");
 let scaleX = d3.scaleLinear().domain([-10, 10]).range([0, 800]);
 let scaleY = d3.scaleLinear().domain([-10, 10]).range([0, 800]);
 let svg = d3.select("svg");
-let canvas = document.getElementById("canvas");
+let canvas = document.getElementById("canvas") || "";
 let ctx = canvas.getContext("2d");
 // An object to hold paths for each ant
 let antPaths = {};
@@ -152,20 +55,6 @@ socket.onmessage = function (event) {
     }
   });
 
-  // Fade all paths over time
-  // svg.selectAll('.ant-path')
-  //   .attr('stroke', (d, i, nodes) => {
-  //     let currentColor = d3.color(d3.select(nodes[i]).attr('stroke'));
-
-  //     if (currentColor.opacity <= 0) {
-  //       currentColor.opacity = 1.0
-  //     } else {
-  //       currentColor.opacity -= 0.01;
-  //     }
-
-  //     return currentColor;
-  //   });
-
   // Update the food sources.
   const foodSelection = svg
     .selectAll(".food")
@@ -200,7 +89,7 @@ socket.onmessage = function (event) {
     .attr("fill", "purple");
 
   // Display gathered food.
-  const foodCounter = d3.select("#food-counter");
+  let foodCounter = d3.select("#food-counter");
   if (foodCounter.empty()) {
     foodCounter = svg
       .append("text")
