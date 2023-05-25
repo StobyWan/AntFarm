@@ -92,16 +92,6 @@ export class AntSimulator {
       }
     }
 
-    // Reduce the strength of all pheromones.
-    // for (let ant of this.ants) {
-    //   if (ant.pheromone) {
-    //     ant.pheromone.strength--;
-    //     if (ant.pheromone.strength <= 0) {
-    //       ant.pheromone = null;
-    //     }
-    //   }
-    // }
-
     for (let pheromone of this.pheromones) {
       pheromone.strength--;
       if (pheromone.strength <= 0) {
