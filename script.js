@@ -1,21 +1,21 @@
 "use strict";
-let socket = new WebSocket("ws://localhost:8080");
-let scaleX = d3.scaleLinear().domain([-10, 10]).range([0, 800]);
-let scaleY = d3.scaleLinear().domain([-10, 10]).range([0, 800]);
+const socket = new WebSocket("ws://localhost:8080");
+let mainDiv = document.querySelector('.main');
+let width = mainDiv.offsetWidth;
+let scaleX = d3.scaleLinear().domain([-10, 10]).range([0, width]);
+let scaleY = d3.scaleLinear().domain([-10, 10]).range([0, width]);
 let svg = d3.select("svg");
-let canvas = document.getElementById("canvas") || "";
-let ctx = canvas.getContext("2d");
+let simId = "";
+const foodValue = document.getElementById('gathered-food');
 // An object to hold paths for each ant
 let antPaths = {};
-function drawBackground() {
-    ctx.fillStyle = "brown";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
 socket.onmessage = function (event) {
     // Parse the incoming message to get the state of the simulation.
-    const state = JSON.parse(event.data);
+    const body = JSON.parse(event.data);
+    const { id, state } = body;
+    console.log('id', id);
+    simId = id;
     const { pheromones, foodSources, ants } = state;
-    drawBackground();
     // Update the ants.
     const antSelection = svg.selectAll(".ant").data(ants, (d) => d.id);
     antSelection
@@ -67,17 +67,18 @@ socket.onmessage = function (event) {
         .attr("r", (d) => d.strength / 5) // Size depends on the pheromone's strength.
         .attr("fill", "purple");
     // Display gathered food.
-    let foodCounter = d3.select("#food-counter");
-    if (foodCounter.empty()) {
-        foodCounter = svg
-            .append("text")
-            .attr("id", "food-counter")
-            .attr("x", 40)
-            .attr("y", 200)
-            .attr("font-size", "20px")
-            .attr("fill", "black");
-    }
-    foodCounter.text(`Gathered food: ${state.gatheredFood}`);
+    // let foodCounter: any = d3.select("#food-counter");
+    // if (foodCounter.empty()) {
+    //   foodCounter = svg
+    //     .append("text")
+    //     .attr("id", "food-counter")
+    //     .attr("x", 40)
+    //     .attr("y", 200)
+    //     .attr("font-size", "20px")
+    //     .attr("fill", "black");
+    // }
+    // foodCounter.text(`Gathered food: ${state.gatheredFood}`);
+    foodValue.value = state.gatheredFood;
     const antPathSelection = svg.selectAll(".ant-path").data(ants, (d) => d.id);
     // Helper function to generate path data from ant positions
     function generatePathData(ant) {
@@ -96,3 +97,30 @@ socket.onmessage = function (event) {
         .attr("stroke", (d) => `rgba(255, 255, 255, ${d.alpha})`)
         .attr("stroke-width", 2);
 };
+const pheromoneStrengthSlider = document.getElementById('pheromone-strength');
+const lifespanSlider = document.getElementById('lifespan');
+const pheromoneStrengthValue = document.getElementById('pheromone-value');
+const lifespanValue = document.getElementById('lifespan-value');
+pheromoneStrengthSlider.addEventListener('input', (e) => {
+    const target = e.target;
+    const newValue = target.value;
+    pheromoneStrengthValue.textContent = newValue;
+    // Now send the new value to the server
+    sendValueToServer('pheromone-strength', newValue);
+});
+lifespanSlider.addEventListener('input', (e) => {
+    const target = e.target;
+    const newValue = target.value;
+    lifespanValue.textContent = newValue;
+    // Now send the new value to the server
+    sendValueToServer('lifespan', newValue);
+});
+function sendValueToServer(parameter, value) {
+    console.log("parameter", parameter);
+    const message = {
+        simId,
+        parameter: parameter,
+        value: value
+    };
+    socket.send(JSON.stringify(message));
+}
